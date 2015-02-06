@@ -27,7 +27,7 @@ class Card
         int getValue() { 
         	return value; }
 
-        string toString() { 
+        string toString() { // Set symbols according to suit and return symbol and value
             int x;
 
             if(suit == "Clubs") 
@@ -79,12 +79,68 @@ struct player {
 
     string name;
     int money;
+    bool busted = false;
+    bool hit = false;
     vector<Card> hand;
 };
 
+void writeHand(vector<player> &playerV, int x) { // Writes players hand
 
+     cout << playerV[x].name  << " ";
 
-void play(){
+     for(int i = 0; i<playerV[x].hand.size(); i++)
+        cout << playerV[x].hand[i].toString() << " ";
+    
+    cout << endl;
+}
+
+int score(vector<player> &playerV, int x) { // Get players score and checks if player is busted
+
+    int playerScore = 0;
+
+        for(int i = 0; i<playerV[x].hand.size(); i++) {
+
+            playerScore += playerV[x].hand[i].getValue(); 
+
+            if(playerScore > 21)
+                playerV[x].busted = true;
+        }          
+        return playerScore; 
+}
+
+void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he wants to stand or hit
+
+    string x;
+    int i = 0; 
+
+    while(i<playerV.size() - 1){
+
+        do 
+        {   
+            if(playerV[i].busted) { // Player is busted go to next player
+                i++;
+                break;
+            }
+            writeHand(playerV, i);
+            cout << playerV[i].name << "     Score: " << score(playerV, i) << "     (s)tand or (h)it?" << endl;
+            cin >> x;
+        }while(x != "s" && x != "h"); // Do while player doesn't press s or h
+
+        if(x == "h") { // Player hits, deal card
+            playerV[i].hand.push_back(deck.drawCard());
+
+            if(playerV[i].busted) { // Check if player is busted after hit
+                cout << playerV[i].name " is busted" << endl;
+                i++; // Busted, go to next player
+            }
+        }
+
+        if(x == "s") // Player stands, go to next player
+            i++;
+    }
+}
+
+void play() {
   
   Deck deck;
   deck.shuffle();
@@ -106,8 +162,8 @@ void play(){
         playerV.push_back(player());
 
     for(int i = 0; i<players; i++) { // Set Players name and money
-        playerV[i].name = "Player" + (i+1);
-        playerV[i].money = 150;
+        playerV[i].name = "Player" + to_string(i+1);
+        playerV[i].money = 150; 
     }
 
     playerV[playerV.size()-1].name = "Dealer"; // Set name for Dealer
@@ -121,32 +177,12 @@ void play(){
         playerV[i].hand.push_back(deck.drawCard()); //
     }                                               //**********
 
-    /*cout << "Name: " << playerV[playerV.size()-1].name << endl
-    << "  Card1  " << playerV[playerV.size()-1].hand[0].toString() << endl
-    << "  Card2  " <<  playerV[playerV.size()-1].hand[1].toString() << endl
-    << "  Card1 Value:  " <<  playerV[playerV.size()-1].hand[0].getValue() << endl
-    << "  Card2 Value:  " << playerV[playerV.size()-1].hand[1].getValue() << endl
-    << endl;*/
-
-    /*for(int x = 0; x<playerV.size(); x++) {
-        player p = playerV[x];
-        for(int i = 0; i<2; i++)
-            cout << p.hand[i].toString();
-    }*/
-    /*vector<Card> d = deck.getDeck();
-    for (int i = 0; i < d.size(); i++) cout << d[i].toString() << endl;*/
-
-    
-
+    decision(playerV, deck);
 
 };
 
+
  int main() {
 
-    /*Deck deck;
-    deck.shuffle();
-    Card c = deck.drawCard();
-    cout << c.toString() << endl;*/
     play();
  }
-

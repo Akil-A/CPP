@@ -92,8 +92,11 @@ struct player {
 
     string name;
     int money;
+    int bet = 0;
     bool busted = false;
     bool won = false;
+    bool standOut = false;
+    bool isBet = false;
     vector<Card> hand;
 };
 
@@ -136,6 +139,29 @@ int score(vector<player> &playerV, int x) { // Get players score and checks if p
         return playerScore; 
 }
 
+void bet(vector<player> &playerV, int x) {
+
+    int bet = 0;
+    string s;
+    do
+    {
+        cout << playerV[x].name << " bet from 1 to " << playerV[x].money << " or (s)tand out" << endl;
+        cin >> bet;
+        if (cin.fail()) {
+        cin.clear();
+        cin >> s;
+        }
+    }while((bet < 1 || bet > playerV[x].money) || s == "s" || bet == 0);
+
+    if(s == "s")
+        playerV[x].standOut = true;
+
+    if(bet != 0) {
+        playerV[x].bet = bet;
+        playerV[x].isBet = true;
+    }
+}
+
 void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he wants to stand or hit
 
     string x;
@@ -145,17 +171,22 @@ void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he 
     while(i<playerV.size() - 1){
 
         do 
-        {   
-            if(playerV[i].busted || playerV[i].won == true) { // Player is busted or has won, go to next player
+        {   if(playerV[i].standOut == false && playerV[i].isBet == false) 
+                bet(playerV, i);
+
+            if(playerV[i].busted || playerV[i].won == true || playerV[i].standOut == true) { // Player is busted or has won, go to next player
                 i++;
                 break;
             }
             writeHand(playerV, i);
             playerScore = score(playerV, i);
 
-            if(playerScore == 21) {
-                cout << playerV[i].name << "  You won!" << endl;
+            if(playerScore == 21 && playerV[i].won != true) {
+                cout << playerV[i].name << "  You have blackjack!" << endl;
+                playerV[i].money *= 1.5;
+                cout << playerV[i].name << "  You won " << endl;
                 playerV[i].won = true;
+                i++;
             }
             else {
                 cout << playerV[i].name << "     Score: " << playerScore << "     (s)tand or (h)it?" << endl;
@@ -168,8 +199,10 @@ void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he 
             playerScore = score(playerV, i);
 
             if(playerScore == 21 && playerV[i].won != true) {
+                writeHand(playerV, i);
                 cout << playerV[i].name << "  You won!" << endl;
                 playerV[i].won = true;
+                i++;
             }
             if(playerV[i].busted && playerV[i].won != true) { // Check if player is busted after hit
                 writeHand(playerV, i);
@@ -201,7 +234,7 @@ void play() {
 
     vector<player> playerV; // Vector of Players
 
-    for(int i = 0; i<players+1; i++) // Make new Players, last "Player" is Dealer
+    for(int i = 0; i<players+1; i++) // Make new Players, last Player is Dealer
         playerV.push_back(player());
 
     for(int i = 0; i<players; i++) { // Set Players name and money
@@ -227,3 +260,4 @@ void play() {
 
     play();
  }
+

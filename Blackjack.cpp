@@ -25,19 +25,32 @@ class Card
         	return suit; 
         }
         int getValue() { 
-        	return value; }
+        	return value; 
+        }
+        int setValue(int v) { 
+            value = v; 
+        }
 
         string toString() { // Set symbols according to suit and return symbol and value
             int x;
 
             if(suit == "Clubs") 
                 x = 0;
-            if(suit == "Hearts") 
+            else if(suit == "Hearts") 
                 x = 1;
-            if(suit == "Spades")    
+            else if(suit == "Spades")    
                 x = 2;
-            if(suit == "Diamonds")
+            else if(suit == "Diamonds")
                 x = 3;
+
+            if(value == 11)
+               return symbols[x] + " " + "Ace";
+            else if(value == 12)
+                return symbols[x] + " " + "Jack";
+            else if(value == 13)
+                return symbols[x] + " " + "Queen";
+            else if(value == 14)
+                return symbols[x] + " " + "King";
 
             return symbols[x] + " " + to_string(value); 
         }       
@@ -53,7 +66,7 @@ private:
        Deck() { // make deck
 
             for(int i = 0; i < 4; i++) 
-                for (int j = 0; j< 13; j++)
+                for (int j = 2; j < 15; j++)
                     deck.push_back(Card(suits[i],j));         
         }
 
@@ -80,7 +93,7 @@ struct player {
     string name;
     int money;
     bool busted = false;
-    bool hit = false;
+    bool won = false;
     vector<Card> hand;
 };
 
@@ -97,10 +110,25 @@ void writeHand(vector<player> &playerV, int x) { // Writes players hand
 int score(vector<player> &playerV, int x) { // Get players score and checks if player is busted
 
     int playerScore = 0;
+    int aces = 0;
+    int value = 0;
 
         for(int i = 0; i<playerV[x].hand.size(); i++) {
 
-            playerScore += playerV[x].hand[i].getValue(); 
+            value = playerV[x].hand[i].getValue();
+
+            if(value > 11)
+                playerScore += 10;
+            else
+                playerScore += value; 
+            
+            if(value == 11)
+                aces++;
+
+            while(playerScore > 21 && aces != 0) {
+                playerScore -= 10;
+                aces--;
+            }
 
             if(playerScore > 21)
                 playerV[x].busted = true;
@@ -112,31 +140,46 @@ void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he 
 
     string x;
     int i = 0; 
+    int playerScore = 0;
 
     while(i<playerV.size() - 1){
 
         do 
         {   
-            if(playerV[i].busted) { // Player is busted go to next player
+            if(playerV[i].busted || playerV[i].won == true) { // Player is busted or has won, go to next player
                 i++;
                 break;
             }
             writeHand(playerV, i);
-            cout << playerV[i].name << "     Score: " << score(playerV, i) << "     (s)tand or (h)it?" << endl;
-            cin >> x;
+            playerScore = score(playerV, i);
+
+            if(playerScore == 21) {
+                cout << playerV[i].name << "  You won!" << endl;
+                playerV[i].won = true;
+            }
+            else {
+                cout << playerV[i].name << "     Score: " << playerScore << "     (s)tand or (h)it?" << endl;
+                cin >> x;
+            }
         }while(x != "s" && x != "h"); // Do while player doesn't press s or h
 
-        if(x == "h") { // Player hits, deal card
+        if(x == "h" && playerV[i].won != true) { // Player hits, deal card
             playerV[i].hand.push_back(deck.drawCard());
+            playerScore = score(playerV, i);
 
-            if(playerV[i].busted) { // Check if player is busted after hit
-                cout << playerV[i].name " is busted" << endl;
+            if(playerScore == 21 && playerV[i].won != true) {
+                cout << playerV[i].name << "  You won!" << endl;
+                playerV[i].won = true;
+            }
+            if(playerV[i].busted && playerV[i].won != true) { // Check if player is busted after hit
+                writeHand(playerV, i);
+                cout << playerV[i].name << " is busted" << "     Score: " << playerScore << endl;
                 i++; // Busted, go to next player
             }
         }
-
         if(x == "s") // Player stands, go to next player
             i++;
+        playerScore = 0;
     }
 }
 
@@ -168,7 +211,6 @@ void play() {
 
     playerV[playerV.size()-1].name = "Dealer"; // Set name for Dealer
 
-
     for(int i = 0; i<playerV.size(); i++){          //**********  
         playerV[i].hand.push_back(deck.drawCard()); //
     }                                               // 
@@ -178,7 +220,6 @@ void play() {
     }                                               //**********
 
     decision(playerV, deck);
-
 };
 
 

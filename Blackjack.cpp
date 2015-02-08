@@ -142,7 +142,7 @@ int score(vector<player> &playerV, int x) { // Get players score and checks if p
 void bet(vector<player> &playerV, int x) {
 
     int bet = 0;
-    string s;
+    string s = "x";
     do
     {
         cout << playerV[x].name << " bet from 1 to " << playerV[x].money << " or (s)tand out" << endl;
@@ -151,7 +151,7 @@ void bet(vector<player> &playerV, int x) {
         cin.clear();
         cin >> s;
         }
-    }while((bet < 1 || bet > playerV[x].money) || s == "s" || bet == 0);
+    }while( (bet < 1 || bet > playerV[x].money) && (s != "s") );
 
     if(s == "s")
         playerV[x].standOut = true;
@@ -162,11 +162,57 @@ void bet(vector<player> &playerV, int x) {
     }
 }
 
+void dealer(vector<player> &playerV, Deck &deck) {
+
+    while( score(playerV, playerV.size()-1) < 21)
+        playerV[playerV, playerV.size()-1].hand.push_back(deck.drawCard());
+
+    writeHand(playerV, playerV.size()-1);
+}
+
+void whoWon(vector<player> &playerV, Deck &deck) {
+
+    dealer(playerV, deck);
+    int dealerScore = score(playerV, playerV.size()-1);
+
+    if(dealerScore > 21) {
+        cout << "Dealer busted" << " Score: " << dealerScore << endl;
+        for(int i = 0; i<playerV.size()-1; i++) {
+
+            if(playerV[i].won != true && playerV[i].busted != true) {
+                playerV[i].won = true;
+                playerV[i].money = (playerV[i].bet * 2);
+                cout << playerV[i].name << " has won " << (playerV[i].bet * 2) << endl;
+            }
+                
+        }
+    }
+    else {
+        for(int i = 0; i<playerV.size()-1; i++) {
+
+            if( (score(playerV,i) < dealerScore) && dealerScore <= 21){
+                cout << playerV[i].name << " lost" << endl;
+                playerV[i].money -= playerV[i].bet;
+            }
+            else if(score(playerV,i) == dealerScore) {
+                cout << playerV[i].name << " has drawn, you will get your money back" << endl;
+                playerV[i].money += playerV[i].bet;
+            }
+            else if ( (score(playerV,i) > dealerScore) && playerV[i].won != true){
+                cout << playerV[i].name << " won " << (playerV[i].bet * 2) << endl;
+                playerV[i].won = true;
+                playerV[i].money += (playerV[i].bet * 2);
+            }
+        }
+    }
+}
+
 void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he wants to stand or hit
 
     string x;
     int i = 0; 
     int playerScore = 0;
+    int playerBet = playerV[i].bet;
 
     while(i<playerV.size() - 1){
 
@@ -174,17 +220,18 @@ void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he 
         {   if(playerV[i].standOut == false && playerV[i].isBet == false) 
                 bet(playerV, i);
 
-            if(playerV[i].busted || playerV[i].won == true || playerV[i].standOut == true) { // Player is busted or has won, go to next player
+            if(playerV[i].busted || playerV[i].won == true || playerV[i].standOut == true) { // Player is busted, has won or stands out, go to next player
                 i++;
                 break;
             }
+            cout << playerV[playerV.size()-1].name << " " << playerV[playerV.size()-1].hand[0].toString() << " ?" << endl;
             writeHand(playerV, i);
             playerScore = score(playerV, i);
 
             if(playerScore == 21 && playerV[i].won != true) {
                 cout << playerV[i].name << "  You have blackjack!" << endl;
-                playerV[i].money *= 1.5;
-                cout << playerV[i].name << "  You won " << endl;
+                playerV[i].money = playerBet*1.5;
+                cout << playerV[i].name << "  You won " << (playerBet*1.5) << endl;
                 playerV[i].won = true;
                 i++;
             }
@@ -216,10 +263,53 @@ void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he 
     }
 }
 
-void play() {
-  
+
+vector<player> playerV; // Vector of Players
+
+void start() {
+
   Deck deck;
   deck.shuffle();
+
+    for(int i = 0; i<playerV.size(); i++){          //**********  
+        playerV[i].hand.push_back(deck.drawCard()); //
+    }                                               // 
+                                                    // Deal two cards to everyone clockwise
+    for(int i = 0; i<playerV.size(); i++){          //
+        playerV[i].hand.push_back(deck.drawCard()); //
+    }                                               //**********
+    decision(playerV, deck);
+    whoWon(playerV, deck);  
+}
+
+void reset(vector<player> &playerV) {
+    string x;
+
+      do
+      {
+        cout << "Play more? (y)es, (n)o" << endl;
+        cin >> x;
+        if(x == "y") {
+            
+            for(int i = 0; i<playerV.size(); i++) {
+                playerV[i].bet = 0;
+                playerV[i].busted = false;
+                playerV[i].won = false;
+                playerV[i].standOut = false;
+                playerV[i].isBet = false;
+                playerV[i].hand.clear();
+            }
+        Deck deck;
+        deck.shuffle();
+        start();
+        decision(playerV, deck);
+        whoWon(playerV, deck);
+        }          
+    }while(x == "y");
+}
+
+ int main() {
+  
   int players;
 
   cout << "### Welcome to Blackjack ###" << endl << endl;
@@ -232,7 +322,6 @@ void play() {
     cin >> players;
     }while(players < 1 || players > 7);
 
-    vector<player> playerV; // Vector of Players
 
     for(int i = 0; i<players+1; i++) // Make new Players, last Player is Dealer
         playerV.push_back(player());
@@ -244,20 +333,6 @@ void play() {
 
     playerV[playerV.size()-1].name = "Dealer"; // Set name for Dealer
 
-    for(int i = 0; i<playerV.size(); i++){          //**********  
-        playerV[i].hand.push_back(deck.drawCard()); //
-    }                                               // 
-                                                    // Deal two cards to everyone clockwise
-    for(int i = 0; i<playerV.size(); i++){          //
-        playerV[i].hand.push_back(deck.drawCard()); //
-    }                                               //**********
-
-    decision(playerV, deck);
-};
-
-
- int main() {
-
-    play();
+    start();
+    reset(playerV);
  }
-

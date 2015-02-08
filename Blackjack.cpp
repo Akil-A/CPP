@@ -141,30 +141,31 @@ int score(vector<player> &playerV, int x) { // Get players score and checks if p
 
 void bet(vector<player> &playerV, int x) {
 
-    int bet = 0;
+    int playerBet = 0;
     string s = "x";
     do
     {
         cout << playerV[x].name << " bet from 1 to " << playerV[x].money << " or (s)tand out" << endl;
-        cin >> bet;
+        cin >> playerBet;
         if (cin.fail()) {
         cin.clear();
         cin >> s;
         }
-    }while( (bet < 1 || bet > playerV[x].money) && (s != "s") );
+    }while( (playerBet < 1 || playerBet > playerV[x].money) && (s != "s") );
 
     if(s == "s")
         playerV[x].standOut = true;
 
-    if(bet != 0) {
-        playerV[x].bet = bet;
+    if(playerBet != 0) {
+        playerV[x].bet = playerBet;
+        playerV[x].money -= playerBet;
         playerV[x].isBet = true;
     }
 }
 
 void dealer(vector<player> &playerV, Deck &deck) {
 
-    while( score(playerV, playerV.size()-1) < 21)
+    while( score(playerV, playerV.size()-1) < 17)
         playerV[playerV, playerV.size()-1].hand.push_back(deck.drawCard());
 
     writeHand(playerV, playerV.size()-1);
@@ -179,26 +180,23 @@ void whoWon(vector<player> &playerV, Deck &deck) {
         cout << "Dealer busted" << " Score: " << dealerScore << endl;
         for(int i = 0; i<playerV.size()-1; i++) {
 
-            if(playerV[i].won != true && playerV[i].busted != true) {
+            if(playerV[i].won != true && playerV[i].busted != true && playerV[i].isBet && playerV[i].standOut != true) {
                 playerV[i].won = true;
-                playerV[i].money = (playerV[i].bet * 2);
+                playerV[i].money += (playerV[i].bet * 2);
                 cout << playerV[i].name << " has won " << (playerV[i].bet * 2) << endl;
             }
-                
         }
     }
     else {
         for(int i = 0; i<playerV.size()-1; i++) {
 
-            if( (score(playerV,i) < dealerScore) && dealerScore <= 21){
+            if( (score(playerV,i) < dealerScore) && dealerScore <= 21 && playerV[i].standOut != true && playerV[i].isBet && playerV[i].won != true && playerV[i].busted != true){
                 cout << playerV[i].name << " lost" << endl;
-                playerV[i].money -= playerV[i].bet;
             }
-            else if(score(playerV,i) == dealerScore) {
+            else if(score(playerV,i) == dealerScore && playerV[i].standOut != true && playerV[i].isBet && playerV[i].won != true && playerV[i].busted != true) {
                 cout << playerV[i].name << " has drawn, you will get your money back" << endl;
                 playerV[i].money += playerV[i].bet;
-            }
-            else if ( (score(playerV,i) > dealerScore) && playerV[i].won != true){
+            } else if ( (score(playerV,i) > dealerScore) && playerV[i].won != true && playerV[i].standOut != true && playerV[i].isBet && playerV[i].busted != true){
                 cout << playerV[i].name << " won " << (playerV[i].bet * 2) << endl;
                 playerV[i].won = true;
                 playerV[i].money += (playerV[i].bet * 2);
@@ -212,12 +210,12 @@ void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he 
     string x;
     int i = 0; 
     int playerScore = 0;
-    int playerBet = playerV[i].bet;
+    int dealerScore = score(playerV, playerV.size()-1);
 
     while(i<playerV.size() - 1){
 
         do 
-        {   if(playerV[i].standOut == false && playerV[i].isBet == false) 
+        {   if(playerV[i].standOut == false && playerV[i].isBet == false && playerV[i].won == false && playerV[i].busted != true) 
                 bet(playerV, i);
 
             if(playerV[i].busted || playerV[i].won == true || playerV[i].standOut == true) { // Player is busted, has won or stands out, go to next player
@@ -230,12 +228,20 @@ void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he 
 
             if(playerScore == 21 && playerV[i].won != true) {
                 cout << playerV[i].name << "  You have blackjack!" << endl;
-                playerV[i].money = playerBet*1.5;
-                cout << playerV[i].name << "  You won " << (playerBet*1.5) << endl;
+                playerV[i].money += (playerV[i].bet*1.5);
+                cout << playerV[i].name << "  You won " << (playerV[i].bet*1.5) << endl;
                 playerV[i].won = true;
-                i++;
-            }
-            else {
+            } else if(dealerScore == 21) {
+                cout << "Dealer has blackjack" << " Score: " << dealerScore << endl;
+                for(int i = 0; i<playerV.size()-1; i++) {
+
+                    if(playerV[i].busted != true && playerV[i].isBet != true && playerV[i].standOut != true) {
+                    playerV[i].money -= playerV[i].bet;
+                    cout << playerV[i].name << " has lost " << playerV[i].bet << endl;
+                    playerV[i].busted = true;
+                    }
+                }
+            } else {
                 cout << playerV[i].name << "     Score: " << playerScore << "     (s)tand or (h)it?" << endl;
                 cin >> x;
             }
@@ -245,14 +251,15 @@ void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he 
             playerV[i].hand.push_back(deck.drawCard());
             playerScore = score(playerV, i);
 
-            if(playerScore == 21 && playerV[i].won != true) {
+            if(playerScore == 21 && playerV[i].won != true && playerV[i].busted != true) {
                 writeHand(playerV, i);
                 cout << playerV[i].name << "  You won!" << endl;
+                playerV[i].money += (playerV[i].bet*2);
                 playerV[i].won = true;
-                i++;
             }
             if(playerV[i].busted && playerV[i].won != true) { // Check if player is busted after hit
                 writeHand(playerV, i);
+                playerV[i].busted = true;
                 cout << playerV[i].name << " is busted" << "     Score: " << playerScore << endl;
                 i++; // Busted, go to next player
             }
@@ -336,3 +343,4 @@ void reset(vector<player> &playerV) {
     start();
     reset(playerV);
  }
+

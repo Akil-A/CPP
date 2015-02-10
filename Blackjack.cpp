@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
+#include <random>
 
 using namespace std;
 
@@ -70,8 +71,8 @@ private:
         }
 
         void shuffle(){      
-            srand(time(0));   
-            random_shuffle(deck.begin(), deck.end()); 
+            mt19937 generator (time(0));
+            std::shuffle(deck.begin(), deck.end(), generator); 
         }
 
         Card drawCard(){

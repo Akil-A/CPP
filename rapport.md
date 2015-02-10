@@ -8,6 +8,9 @@ if(playerScore == 21 && playerV[x].hand.size() == 2)
 
  i score() funksjonen.
  
+ Men det er sikkert dumt at jeg sjekker if(playerV[i].blackjack) for hvert loop i decision metoden() 
+
+ 
  Dealer fikk også dobbelutskrift når den ble busted pga utksriften i decision() funksjonen der koden sier fra linje 258:
  
  if(playerV[i].busted && !playerV[i].won && playerV[i].name != "Dealer") { // Check if player is busted after hit

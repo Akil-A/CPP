@@ -35,7 +35,7 @@ if(playerScore == 21 && playerV[x].hand.size() == 2)
   Jeg leste oppgaven fort (dumt) og trodde at vi måtte lage multiplayer så jeg fikk ikke tid til å gjøre "utfordnende"
   delen av obligen, synes dette var mest interessante oppgave vi har fått på skolen i alle fag til ennå og håper at
   neste obligen handler om å videreutvikle blackjack vi lagde nå så vi kan ta med ting som "double", "split", og 
-  noe av det mest interresante funksjon som å telle kort og vise sannsylighet for å buste etter hvert kort.
+  noe av det mest interresante funksjonen ifølge meg som å telle kort og vise sannsylighet for å buste etter hvert kort.
   
   Jeg tror ikke at jeg kommer til å se noen ulemper på måten jeg løste oppgaven før jeg må videreutvikle, da
   blir det sikkert noen åpenbaringer om noen ting jeg ikke har gjort optimalt.

@@ -17,7 +17,7 @@ if(playerScore == 21 && playerV[x].hand.size() == 2)
                 i++;
             }
   
-  Dette burde egentlig ikke være mulig fordi jeg har skreved i while løkka i linje 232:
+  Dette burde egentlig ikke være mulig fordi jeg har skrevet i while løkka i linje 232:
   i<(playerV.size()-1) 
   Dealer er siste player i playerV vector og derfor burde ikke det være mulig at man kom til Dealer i den metoden, 
   er kanskje pga i++ jeg har gjennom hele metoden, men jeg fant ikke feilen så jeg bare bruteforca ved å skrive:

@@ -28,7 +28,7 @@ class Card
         	return value; 
         }
         int setValue(int v) { 
-            value = v; 
+            return value = v; 
         }
 
         string toString() { // Set symbols according to suit and return symbol and value
@@ -64,20 +64,17 @@ private:
     public:
 
        Deck() { // make deck
-
             for(int i = 0; i < 4; i++) 
                 for (int j = 2; j < 15; j++)
                     deck.push_back(Card(suits[i],j));         
         }
 
-        void shuffle(){
-            
+        void shuffle(){      
             srand(time(0));   
             random_shuffle(deck.begin(), deck.end()); 
         }
 
         Card drawCard(){
-
             Card c = deck.front(); 
             deck.erase(deck.begin());
             return c;
@@ -91,7 +88,7 @@ private:
 struct player {
 
     string name;
-    int money;
+    double money;
     int bet = 0;
     bool busted = false;
     bool won = false;
@@ -101,13 +98,11 @@ struct player {
     vector<Card> hand;
 };
 
-
-
 int score(vector<player> &playerV, int x) { // Get players score and checks if player is busted
 
     int playerScore = 0;
     int aces = 0;
-    double value = 0;
+    int value = 0;
 
         for(int i = 0; i<playerV[x].hand.size(); i++) {
 
@@ -178,7 +173,7 @@ void bet(vector<player> &playerV) {
 void dealer(vector<player> &playerV, Deck &deck) {
 
     while( score(playerV, playerV.size()-1) < 17)
-        playerV[playerV, playerV.size()-1].hand.push_back(deck.drawCard());
+        playerV[playerV.size()-1].hand.push_back(deck.drawCard());
 
     writeHand(playerV, playerV.size()-1);
 }
@@ -235,7 +230,6 @@ void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he 
     int dealerScore = score(playerV, playerV.size()-1);
 
     while( i<(playerV.size()-1) ){
-
         do 
         {   
             cout << playerV[playerV.size()-1].name << " " << playerV[playerV.size()-1].hand[0].toString() << " ?" << endl;
@@ -261,10 +255,10 @@ void decision(vector<player> &playerV, Deck &deck) { // Player decides if (s)he 
             playerV[i].hand.push_back(deck.drawCard());
             playerScore = score(playerV, i);
 
-            if(playerV[i].busted && !playerV[i].won) { // Check if player is busted after hit
+            if(playerV[i].busted && !playerV[i].won && playerV[i].name != "Dealer") { // Check if player is busted after hit
                 writeHand(playerV, i);
                 playerV[i].busted = true;
-                cout << playerV[i].name << " is busted and has lost " << playerV[i].bet << " chips" << endl;
+                cout << playerV[i].name << " is busted and has lost " << playerV[i].bet << " chips" << endl << endl;
                 i++;
             }
         }
@@ -326,7 +320,6 @@ void reset(vector<player> &playerV) {
     cout << "Enter number of players (1-7): ";
     cin >> players;
     }while(players < 1 || players > 7);
-
 
     for(int i = 0; (i<players+1); i++) // Make new Players, last Player is Dealer
         playerV.push_back(player());

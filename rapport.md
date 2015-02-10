@@ -41,7 +41,7 @@ if(playerScore == 21 && playerV[x].hand.size() == 2)
   noe av det mest interresante funksjonen ifølge meg som å telle kort og vise sannsylighet for å buste etter hvert kort.
   
   Jeg tror ikke at jeg kommer til å se noen ulemper på måten jeg løste oppgaven før jeg må videreutvikle, da
-  blir det sikkert noen åpenbaringer om noen ting jeg ikke har gjort optimalt.
+  blir det sikkert noen åpenbaringer om noen ting jeg ikke har gjort optimalt. Men selvfølgelig burde alt vært objektorientert.
   
  
  

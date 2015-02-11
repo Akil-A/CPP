@@ -142,7 +142,7 @@ void writeHand(vector<player> &playerV, int x) { // Writes players hand
     cout << " Score: " << playerScore << endl << "==============================================" << endl;
 }
 
-void bet(vector<player> &playerV) {
+void bet(vector<player> &playerV) { //Player bets
 
     int playerBet = 0;
     string s;
@@ -171,7 +171,7 @@ void bet(vector<player> &playerV) {
     }
 }
 
-void dealer(vector<player> &playerV, Deck &deck) {
+void dealer(vector<player> &playerV, Deck &deck) { //Deal cards to Dealer
 
     while( score(playerV, playerV.size()-1) < 17)
         playerV[playerV.size()-1].hand.push_back(deck.drawCard());
@@ -289,7 +289,7 @@ void start() {
     whoWon(playerV, deck);  
 }
 
-void reset(vector<player> &playerV) {
+void reset(vector<player> &playerV) { //Reset player variables  and get ready for new round
     string x;
 
       do

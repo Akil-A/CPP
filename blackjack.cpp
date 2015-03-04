@@ -145,12 +145,12 @@ void writeHand(vector<player> &playerV, int x) { // Writes players hand
 
 void bet(vector<player> &playerV) { //Player bets
 
-    int playerBet;
+    int playerBet = 0;
     string s;
 
     for(int i = 0; i<(playerV.size()-1); i++) {
 
-        if(playerV[i].money > 0) {
+        if(playerV[i].money != 0) {
             do
             {    
                 cout << endl << playerV[i].name << " bet from 1 to " << playerV[i].money << " or (s)tand out" << endl;
@@ -177,7 +177,6 @@ void bet(vector<player> &playerV) { //Player bets
             playerV[i].money -= playerBet;
             playerV[i].isBet = true;
         }
-
         s = "";
     }
 }
@@ -290,7 +289,7 @@ bool broke(vector<player> &playerV) { // Check if all players are broke
     int x = 0;
 
     for(int i = 0; i<playerV.size()-1; i++)
-        if( !(playerV[i].money > 0) ) {
+        if( playerV[i].money == 0 ) {
             playerV[i].broke = true;
             x++;
         }

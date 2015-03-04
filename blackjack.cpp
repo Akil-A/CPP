@@ -320,32 +320,32 @@ void start() {
 void reset(vector<player> &playerV) { //Reset player variables and get ready for new round
     string x;
 
-        do
-        {
-            if(broke(playerV)) {
-                cout << endl << "===All players are broke and the game ends===" << endl << endl;
-                x = "n";
-            }
-            else {
+    do
+    {
+        if(broke(playerV)) {
+            cout << endl << "===All players are broke and the game ends===" << endl << endl;
+            x = "n";
+        }
+        else {
 
-                cout << endl << "Play more? (y)es, (n)o" << endl;
-                cin >> x;
-                if(x == "y") {
-            
-                    for(int i = 0; i<playerV.size(); i++) {
-                        playerV[i].bet = 0;
-                        playerV[i].busted = false;
-                        playerV[i].won = false;
-                        if(!playerV[i].broke)
-                            playerV[i].standOut = false;
-                        playerV[i].isBet = false;
-                        playerV[i].blackjack = false;
-                        playerV[i].hand.clear();
-                    }
-                start();
-                }  
-            }        
-        }while(x == "y");
+            cout << endl << "Play more? (y)es, (n)o" << endl;
+            cin >> x;
+            if(x == "y") {
+        
+                for(int i = 0; i<playerV.size(); i++) {
+                    playerV[i].bet = 0;
+                    playerV[i].busted = false;
+                    playerV[i].won = false;
+                    if(!playerV[i].broke)
+                        playerV[i].standOut = false;
+                    playerV[i].isBet = false;
+                    playerV[i].blackjack = false;
+                    playerV[i].hand.clear();
+                }
+            start();
+            }  
+        }        
+    }while(x == "y");
 }   
 
  int main() {
